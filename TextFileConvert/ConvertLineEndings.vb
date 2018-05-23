@@ -14,8 +14,8 @@ Public Class ConvertLineEndings
         Ux2Mac
     End Enum
 
-    Const CR = ChrW(13)
-    Const LF = ChrW(10)
+    Const CR As Char = ChrW(13)
+    Const LF As Char = ChrW(10)
 
     ''' <summary>
     ''' Converts a DOS text file to have Unix line endings.
@@ -45,28 +45,35 @@ Public Class ConvertLineEndings
     ''' <param name="convertMode">This is the type of conversion we are going to perform</param>
     ''' <returns>Exit code.</returns>
     Private Shared Async Function ReplaceLineEndings(originalFile As String, newFile As String, convertMode As TextConvertMode) As Task(Of Integer)
+        ' Attempt to detect encoding
+        Dim fileEncoding As Encoding = GetEncoding(originalFile)
+        If fileEncoding Is Nothing Then Return 4
+        Debug.Print(fileEncoding.ToString())
+
         Dim convertedText As New StringBuilder
         Dim oldFileStream As FileStream = Nothing
         Try
             oldFileStream = New FileStream(originalFile, FileMode.Open)
-            Using oldFile As New StreamReader(oldFileStream)
+            Using oldFile As New StreamReader(oldFileStream, fileEncoding, True)
                 Do Until oldFile.EndOfStream
-                    Dim readBuffer(2) As Char
+                    Dim readBuffer(0) As Char
                     Dim readChars As Integer = Await oldFile.ReadAsync(readBuffer, 0, 1)
                     If readChars < 1 Then Exit Do
                     Select Case convertMode
                         Case TextConvertMode.Dos2Ux
                             If readBuffer(0) = CR AndAlso oldFile.Peek() = 10 Then
                                 ' Strip out CR chars if followed by LF
-                                readBuffer(0) = Nothing
+                                Await oldFile.ReadAsync(readBuffer, 0, 1)
                             End If
                         Case TextConvertMode.Ux2Dos
                             If readBuffer(0) = CR AndAlso oldFile.Peek() = 10 Then
+                                ReDim Preserve readBuffer(1)
                                 ' This is a DOS line ending, keep it.
                                 Dim tempBuffer(1) As Char
                                 Await oldFile.ReadAsync(tempBuffer, 0, 1)
                                 readBuffer(1) = tempBuffer(0)
-                            ElseIf readBuffer(0) = ChrW(10) Then
+                            ElseIf readBuffer(0) = LF Then
+                                ReDim readBuffer(1)
                                 ' Add preceeding CR
                                 readBuffer(0) = CR
                                 readBuffer(1) = LF
@@ -80,7 +87,7 @@ Public Class ConvertLineEndings
             End Using
             oldFileStream = Nothing
         Catch ex As Exception
-            Debug.Print("Error: " & ex.Message & vbCrLf & "Number: " & ex.HResult)
+            Debug.Print("Error: " & ex.Message & Environment.NewLine & "Number: " & ex.HResult.ToString)
             Return ex.HResult
         Finally
             If oldFileStream IsNot Nothing Then oldFileStream.Dispose()
@@ -88,12 +95,37 @@ Public Class ConvertLineEndings
 
         'Write the result out to a new file
         Try
-            Await File.WriteAllTextAsync(newFile, convertedText.ToString())
+            File.WriteAllText(newFile, convertedText.ToString(), New UTF8Encoding(False))
         Catch ex As Exception
-            Debug.Print("Error: " & ex.Message & vbCrLf & "Number: " & ex.HResult)
+            Debug.Print("Error: " & ex.Message & Environment.NewLine & "Number: " & ex.HResult.ToString)
             Return ex.HResult
         End Try
 
         Return 0 ' Exit status 0 is a good thing
+    End Function
+
+    ''' <summary>
+    ''' Attempt to detect the encoding of a file.
+    ''' </summary>
+    ''' <param name="filename">The file to get the encoding pattern from.</param>
+    ''' <returns>Encoding type, defaults to ASCII</returns>
+    Public Shared Function GetEncoding(ByVal filename As String) As Encoding
+        Dim bom = New Byte(3) {}
+
+        Try
+            Using file = New FileStream(filename, FileMode.Open, FileAccess.Read)
+                file.Read(bom, 0, 4)
+            End Using
+        Catch ex As Exception
+            Debug.Print("Error: " & ex.Message & Environment.NewLine & "Number: " & ex.HResult.ToString)
+            Return Nothing
+        End Try
+
+        If bom(0) = &H2B AndAlso bom(1) = &H2F AndAlso bom(2) = &H76 Then Return Encoding.UTF7
+        If bom(0) = &HEF AndAlso bom(1) = &HBB AndAlso bom(2) = &HBF Then Return Encoding.UTF8
+        If bom(0) = &HFF AndAlso bom(1) = &HFE Then Return Encoding.Unicode
+        If bom(0) = &HFE AndAlso bom(1) = &HFF Then Return Encoding.BigEndianUnicode
+        If bom(0) = 0 AndAlso bom(1) = 0 AndAlso bom(2) = &HFE AndAlso bom(3) = &HFF Then Return Encoding.UTF32
+        Return Encoding.ASCII
     End Function
 End Class

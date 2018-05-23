@@ -1,6 +1,6 @@
-Imports TextFileConvert
+﻿Imports TextFileConvert
 
-Module Dos2Ux
+Module Ux2Dos
 
     Sub Main(args As String())
         Dim exitCode As Integer
@@ -8,8 +8,8 @@ Module Dos2Ux
             PrintInstructions()
             exitCode = 87
         Else
-            Console.WriteLine("Perform DOS to UNIX conversion")
-            Dim runAsync As Task(Of Integer) = ConvertLineEndings.Dos2Ux(args(0), args(1))
+            Console.WriteLine("Perform UNIX to DOS conversion")
+            Dim runAsync As Task(Of Integer) = ConvertLineEndings.Ux2Dos(args(0), args(1))
             Try
                 runAsync.Wait()
             Catch ex As Exception
@@ -32,14 +32,15 @@ Module Dos2Ux
         Dim helpMessage As String
         helpMessage =
             "NAME
-    dos2ux - Convert ASCII file format
+    ux2dos - Convert ASCII file format
 
 SYNOPSIS
-    dos2ux oldfilename newfilename
+    ux2dos oldfilename newfilename
 
 DESCRIPTION
-    dos2ux reads oldfilename and writes out newfilename, converting line endings from DOS (CRLF) to  UNIX (LF)
+    ux2dos reads oldfilename and writes out newfilename, converting line endings from UNIX (LF) to DOS (CRLF)
             "
         Console.WriteLine(helpMessage)
     End Sub
+
 End Module
