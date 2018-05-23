@@ -3,6 +3,17 @@
   <PropertyGroup>
     <RootNamespace>TextFileConvert</RootNamespace>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <Authors>Adam Kauffman</Authors>
+    <Company>Cascade Engineering Technologies</Company>
+    <NeutralLanguage>en</NeutralLanguage>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <Description>This provides text file conversion capabilities like the common Unix utilities "ux2dos" and "dos2ux".</Description>
+    <Copyright>Copyright 2018 Adam Kauffman</Copyright>
+    <PackageLicenseUrl>https://opensource.org/licenses/MIT</PackageLicenseUrl>
+    <AssemblyVersion>0.1.0.0</AssemblyVersion>
+    <Version>0.1.0</Version>
+    <PackageReleaseNotes>This is the alpha build.</PackageReleaseNotes>
+    <PackageTags>ux2dos, dos2ux</PackageTags>
   </PropertyGroup>
 
 </Project>
