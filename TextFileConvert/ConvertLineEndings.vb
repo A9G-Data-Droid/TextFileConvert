@@ -22,18 +22,20 @@ Public Class ConvertLineEndings
     ''' </summary>
     ''' <param name="originalFile">The file to convert.</param>
     ''' <param name="newFile">The name of a new file to create.</param>
-    Public Sub Dos2Ux(originalFile As String, newFile As String)
-        ReplaceLineEndings(originalFile, newFile, TextConvertMode.Dos2Ux)
-    End Sub
+    ''' <returns>Exit code.</returns>
+    Public Shared Async Function Dos2Ux(originalFile As String, newFile As String) As Task(Of Integer)
+        Return Await ReplaceLineEndings(originalFile, newFile, TextConvertMode.Dos2Ux)
+    End Function
 
     ''' <summary>
     ''' Converts a DOS text file to have Unix line endings.
     ''' </summary>
     ''' <param name="originalFile">The file to convert.</param>
     ''' <param name="newFile">The name of a new file to create.</param>
-    Public Sub Ux2Dos(originalFile As String, newFile As String)
-        ReplaceLineEndings(originalFile, newFile, TextConvertMode.Ux2Dos)
-    End Sub
+    ''' <returns>Exit code.</returns>
+    Public Shared Async Function Ux2Dos(originalFile As String, newFile As String) As Task(Of Integer)
+        Return Await ReplaceLineEndings(originalFile, newFile, TextConvertMode.Ux2Dos)
+    End Function
 
     ''' <summary>
     ''' Loads a whole text file in to memory, Performs a find\replace, and writes a new file.
@@ -41,7 +43,8 @@ Public Class ConvertLineEndings
     ''' <param name="originalFile">The file to convert.</param>
     ''' <param name="newFile">The name of a new file to create.</param>
     ''' <param name="convertMode">This is the type of conversion we are going to perform</param>
-    Private Async Sub ReplaceLineEndings(originalFile As String, newFile As String, convertMode As TextConvertMode)
+    ''' <returns>Exit code.</returns>
+    Private Shared Async Function ReplaceLineEndings(originalFile As String, newFile As String, convertMode As TextConvertMode) As Task(Of Integer)
         Dim convertedText As New StringBuilder
         Dim oldFileStream As FileStream = Nothing
         Try
@@ -70,7 +73,7 @@ Public Class ConvertLineEndings
                             End If
                         Case Else
                             Debug.Print("Unimplemented text conversion mode")
-                            Exit Sub
+                            Return -1
                     End Select
                     convertedText.Append(readBuffer)
                 Loop
@@ -78,8 +81,19 @@ Public Class ConvertLineEndings
             oldFileStream = Nothing
         Catch ex As Exception
             Debug.Print("Error: " & ex.Message & vbCrLf & "Number: " & ex.HResult)
+            Return ex.HResult
         Finally
             If oldFileStream IsNot Nothing Then oldFileStream.Dispose()
         End Try
-    End Sub
+
+        'Write the result out to a new file
+        Try
+            Await File.WriteAllTextAsync(newFile, convertedText.ToString())
+        Catch ex As Exception
+            Debug.Print("Error: " & ex.Message & vbCrLf & "Number: " & ex.HResult)
+            Return ex.HResult
+        End Try
+
+        Return 0 ' Exit status 0 is a good thing
+    End Function
 End Class
