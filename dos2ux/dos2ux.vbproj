@@ -4,6 +4,10 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>dos2ux</RootNamespace>
     <TargetFramework>netcoreapp2.0</TargetFramework>
+    <StartupObject>Sub Main</StartupObject>
+    <ApplicationManifest>My Project\app.manifest</ApplicationManifest>
+    <RuntimeFrameworkVersion>2.0.0-*</RuntimeFrameworkVersion>
+    <RuntimeIdentifiers>win7-x32</RuntimeIdentifiers>
   </PropertyGroup>
 
   <ItemGroup>

@@ -1,10 +1,9 @@
-Imports System
 Imports TextFileConvert
 
-Module Program
+Module dos2ux
     Sub Main(args As String())
         Dim exitCode As Integer
-        If args.LongCount() > 2 OrElse args(0) = Nothing OrElse args(1) = Nothing Then
+        If args.Length <> 2 OrElse args(0) = Nothing OrElse args(1) = Nothing Then
             PrintInstructions()
             exitCode = 87
         Else
