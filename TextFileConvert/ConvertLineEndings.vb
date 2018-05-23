@@ -14,9 +14,6 @@ Public Class ConvertLineEndings
         Ux2Mac
     End Enum
 
-    Const CR As Char = ChrW(13)
-    Const LF As Char = ChrW(10)
-
     ''' <summary>
     ''' Converts a DOS text file to have Unix line endings.
     ''' </summary>
@@ -45,6 +42,9 @@ Public Class ConvertLineEndings
     ''' <param name="convertMode">This is the type of conversion we are going to perform</param>
     ''' <returns>Exit code.</returns>
     Private Shared Async Function ReplaceLineEndings(originalFile As String, newFile As String, convertMode As TextConvertMode) As Task(Of Integer)
+        Const cr As Char = ChrW(13)
+        Const lf As Char = ChrW(10)
+
         ' Attempt to detect encoding
         Dim fileEncoding As Encoding = GetEncoding(originalFile)
         If fileEncoding Is Nothing Then Return 4
@@ -61,22 +61,22 @@ Public Class ConvertLineEndings
                     If readChars < 1 Then Exit Do
                     Select Case convertMode
                         Case TextConvertMode.Dos2Ux
-                            If readBuffer(0) = CR AndAlso oldFile.Peek() = 10 Then
+                            If readBuffer(0) = cr AndAlso oldFile.Peek() = 10 Then
                                 ' Strip out CR chars if followed by LF
                                 Await oldFile.ReadAsync(readBuffer, 0, 1)
                             End If
                         Case TextConvertMode.Ux2Dos
-                            If readBuffer(0) = CR AndAlso oldFile.Peek() = 10 Then
+                            If readBuffer(0) = cr AndAlso oldFile.Peek() = 10 Then
                                 ReDim Preserve readBuffer(1)
                                 ' This is a DOS line ending, keep it.
                                 Dim tempBuffer(1) As Char
                                 Await oldFile.ReadAsync(tempBuffer, 0, 1)
                                 readBuffer(1) = tempBuffer(0)
-                            ElseIf readBuffer(0) = LF Then
+                            ElseIf readBuffer(0) = lf Then
                                 ReDim readBuffer(1)
                                 ' Add preceeding CR
-                                readBuffer(0) = CR
-                                readBuffer(1) = LF
+                                readBuffer(0) = cr
+                                readBuffer(1) = lf
                             End If
                         Case Else
                             Debug.Print("Unimplemented text conversion mode")
@@ -109,7 +109,7 @@ Public Class ConvertLineEndings
     ''' </summary>
     ''' <param name="filename">The file to get the encoding pattern from.</param>
     ''' <returns>Encoding type, defaults to ASCII</returns>
-    Public Shared Function GetEncoding(ByVal filename As String) As Encoding
+    Public Shared Function GetEncoding(filename As String) As Encoding
         Dim bom = New Byte(3) {}
 
         Try
