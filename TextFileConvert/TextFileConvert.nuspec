@@ -6,9 +6,9 @@
     <title>$title$</title>
     <authors>$author$</authors>
     <owners>$author$</owners>
-    <licenseUrl>https://opensource.org/licenses/MIT</licenseUrl>
+    <license type="expression">MIT</license>
     <projectUrl>https://github.com/A9G-Data-Droid/TextFileConvert</projectUrl>
-    <iconUrl>https://github.com/A9G-Data-Droid/TextFileConvert/raw/master/TextFileConvert/ux2dos.ico</iconUrl>
+    <icon>ux2dos.ico</icon>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
     <releaseNotes>Alpha Release.</releaseNotes>

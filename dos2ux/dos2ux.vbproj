@@ -1,5 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <RootNamespace>dos2ux</RootNamespace>
@@ -15,9 +14,7 @@
     <PackageReleaseNotes>This is the alpha build.</PackageReleaseNotes>
     <NeutralLanguage>en</NeutralLanguage>
   </PropertyGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\TextFileConvert\TextFileConvert.vbproj" />
   </ItemGroup>
-
 </Project>
