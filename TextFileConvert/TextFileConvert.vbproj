@@ -18,8 +18,12 @@
     <PublishSingleFile>true</PublishSingleFile>
     <OptionStrict>On</OptionStrict>
     <OptionInfer>Off</OptionInfer>
+    <PackageLicenseExpression>BSD-2-Clause</PackageLicenseExpression>
+    <Company />
   </PropertyGroup>
   <ItemGroup>
-    <None Include="ux2dos.png" Pack="true" PackagePath=""/>
+    <None Include="ux2dos.png" Pack="true" PackagePath="">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>
