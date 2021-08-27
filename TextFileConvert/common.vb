@@ -10,14 +10,16 @@ Public Module common
     ''' <param name="programName"></param>
     Public Sub PrintUsage(programName As String)
         Console.WriteLine(
-"NAME
+"
+NAME
     {0} - Text file format converter
 
 SYNOPSIS
     {0} oldfilename newfilename
 
 DESCRIPTION
-    {0} reads oldfilename and writes out newfilename, converting line endings.", programName)
+    {0} reads oldfilename and writes out newfilename, converting line endings.
+", programName)
     End Sub
 
     ''' <summary>

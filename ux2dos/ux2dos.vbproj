@@ -13,8 +13,8 @@
     <OptionInfer>Off</OptionInfer>
     <Description>This provides text file conversion capabilities like the common Unix utility "ux2dos".</Description>
     <Copyright>Copyright 2018 Adam Kauffman</Copyright>
-    <AssemblyVersion>0.2.0.0</AssemblyVersion>
-    <PackageReleaseNotes>This is the beta build.</PackageReleaseNotes>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <PackageReleaseNotes>The first release verified with integration tests.</PackageReleaseNotes>
     <ApplicationIcon>ux2dos.ico</ApplicationIcon>
     <ApplicationManifest>My Project\app.manifest</ApplicationManifest>
     <NeutralLanguage>en</NeutralLanguage>

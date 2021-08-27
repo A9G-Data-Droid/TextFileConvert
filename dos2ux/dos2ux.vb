@@ -16,7 +16,7 @@ Module Dos2Ux
             Try
                 'exitCode = Await ConvertLineEndings.Dos2Ux(args(0), args(1))
                 exitCode = ConvertLineEndings.Dos2Ux(args(0), args(1)).GetAwaiter().GetResult()
-                Console.WriteLine("Conversion complete.")
+                Console.WriteLine("Conversion complete: " & args(1))
             Catch ex As Exception
                 Console.WriteLine("Conversion failed.")
                 exitCode = ex.HResult
