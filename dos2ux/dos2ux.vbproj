@@ -1,20 +1,43 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
     <OutputType>Exe</OutputType>
-    <RootNamespace>dos2ux</RootNamespace>
-    <TargetFramework>net461</TargetFramework>
+    <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>true</SelfContained>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <PublishTrimmed>true</PublishTrimmed>
+    <PublishReadyToRun>true</PublishReadyToRun>
     <StartupObject>Sub Main</StartupObject>
-    <ApplicationManifest>My Project\app.manifest</ApplicationManifest>
-    <Version>0.1.0</Version>
-    <Authors>Adam Kauffman</Authors>
-    <Company>Cascade Engineering Technologies</Company>
-    <Description>This provides text file conversion capabilities like the common Unix tool.</Description>
+    <MyType>Empty</MyType>
+    <OptionStrict>On</OptionStrict>
+    <OptionInfer>Off</OptionInfer>
+    <Description>This provides text file conversion capabilities like the common Unix utility "dos2ux".</Description>
     <Copyright>Copyright 2018 Adam Kauffman</Copyright>
-    <PackageLicenseUrl>https://opensource.org/licenses/MIT</PackageLicenseUrl>
-    <PackageReleaseNotes>This is the alpha build.</PackageReleaseNotes>
+    <AssemblyVersion>0.2.0.0</AssemblyVersion>
+    <PackageReleaseNotes>This is the beta build.</PackageReleaseNotes>
+    <ApplicationIcon>ux2dos.ico</ApplicationIcon>
+    <ApplicationManifest>My Project\app.manifest</ApplicationManifest>
     <NeutralLanguage>en</NeutralLanguage>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugType>embedded</DebugType>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DefineDebug>false</DefineDebug>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\TextFileConvert\TextFileConvert.vbproj" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Windows.Compatibility" Version="5.0.2" />
+  </ItemGroup>
+  <Target Name="Init">
+    <Warning Text="$(TargetFrameworkMoniker)" />
+    <Warning Text="$(TargetPlatformMoniker)" />
+  </Target>
 </Project>

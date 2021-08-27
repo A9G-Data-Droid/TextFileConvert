@@ -45,13 +45,19 @@ Public Class ConvertLineEndings
                                                      convertMode As TextConvertMode) As Task(Of Integer)
 
         Try
-            Using oldFileStream As New FileStream(originalFile, FileMode.Open)
-                ' Attempt to detect encoding
-                Dim fileEncoding As Encoding = GetEncoding(oldFileStream)
-                If fileEncoding Is Nothing Then Return 4
+            ' Do not attempt to work on symbolic links
+            If IsSymbolic(originalFile) Then Return -1
+
+            Using oldFileStream As New FileStream(originalFile, FileMode.Open, FileAccess.Read)
+                ' Attempt to detect encoding we will use for reading and writing
+                Dim fileEncoding As Encoding = Await GetEncoding(oldFileStream)
                 Debug.Print(fileEncoding.ToString())
 
-                'Write the result out to a new file
+                ' Rewind stream
+                oldFileStream.Position = 0
+                Await oldFileStream.FlushAsync
+
+                ' Reading and writing is done in this one line
                 File.WriteAllText(newFile, Await GetConvertedText(oldFileStream, fileEncoding, convertMode), fileEncoding)
             End Using
         Catch ex As Exception
@@ -63,78 +69,42 @@ Public Class ConvertLineEndings
     End Function
 
     Private Shared Async Function GetConvertedText(originalFile As FileStream, fileEncoding As Encoding, convertMode As TextConvertMode) As Task(Of String)
-        Const cr As Char = ChrW(13)
-        Const lf As Char = ChrW(10)
+        Const CR As Char = ChrW(13)
+        Const LF As Char = ChrW(10)
 
-        Dim convertedLines As StringBuilder = Nothing
-        Try
-            Using oldFile As New StreamReader(originalFile, fileEncoding, True)
-                Do Until oldFile.EndOfStream  ' Read through the whole file
-                    Dim readBuffer(0) As Char
-                    Dim readChars As Integer = Await oldFile.ReadAsync(readBuffer, 0, 1)
-                    If readChars >= 1 Then
-                        Select Case convertMode
-                            Case TextConvertMode.Dos2Ux
-                                If readBuffer(0) = cr AndAlso oldFile.Peek() = 10 Then
-                                    ' Strip out CR chars if followed by LF
-                                    Await oldFile.ReadAsync(readBuffer, 0, 1)
-                                End If
-                            Case TextConvertMode.Ux2Dos
-                                If readBuffer(0) = cr AndAlso oldFile.Peek() = 10 Then
-                                    ReDim Preserve readBuffer(1)
-                                    ' This is a DOS line ending, keep it.
-                                    Dim tempBuffer(1) As Char
-                                    Await oldFile.ReadAsync(tempBuffer, 0, 1)
-                                    readBuffer(1) = tempBuffer(0)
-                                ElseIf readBuffer(0) = lf Then
-                                    ReDim readBuffer(1)
-                                    ' Add preceeding CR
-                                    readBuffer(0) = cr
-                                    readBuffer(1) = lf
-                                End If
-                        End Select
+        Dim convertedLines As New StringBuilder
+        Using oldFile As New StreamReader(originalFile, fileEncoding, True)
+            Do Until oldFile.EndOfStream  ' Read through the whole file
+                Dim readBuffer(0) As Char
+                Dim readChars As Integer = Await oldFile.ReadAsync(readBuffer, 0, 1)
+                If readChars >= 1 Then
+                    Select Case convertMode
+                        Case TextConvertMode.Dos2Ux
+                            If readBuffer(0) = CR AndAlso oldFile.Peek() = 10 Then
+                                ' Strip out CR chars if followed by LF
+                                Await oldFile.ReadAsync(readBuffer, 0, 1)
+                            End If
+                        Case TextConvertMode.Ux2Dos
+                            If readBuffer(0) = CR AndAlso oldFile.Peek() = 10 Then
+                                ReDim Preserve readBuffer(1)
+                                ' This is a DOS line ending, keep it.
+                                Dim tempBuffer(1) As Char
+                                Await oldFile.ReadAsync(tempBuffer, 0, 1)
+                                readBuffer(1) = tempBuffer(0)
+                            ElseIf readBuffer(0) = LF Then
+                                ReDim readBuffer(1)
+                                ' Add preceeding CR
+                                readBuffer(0) = CR
+                                readBuffer(1) = LF
+                            End If
+                    End Select
 
-                        'Yield readBuffer
-                        convertedLines.Append(readBuffer)
-                    End If
-                Loop
-            End Using
-        Catch ex As Exception
-            Debug.Print("Error: " & ex.Message & Environment.NewLine & "Number: " & ex.HResult.ToString)
-            Return ex.HResult.ToString
-        End Try
+                    'Yield readBuffer
+                    convertedLines.Append(readBuffer)
+                End If
+            Loop
+        End Using
 
         Return convertedLines.ToString
-    End Function
-
-    ''' <summary>
-    '''     Attempt to detect the encoding of a file.
-    ''' </summary>
-    ''' <param name="filename">The file to get the encoding pattern from.</param>
-    ''' <returns>Encoding type, defaults to ASCII.</returns>
-    Public Shared Function GetEncoding(theFile As FileStream) As Encoding
-        Dim bom = New Byte(3) {}
-        Try  ' to read BOM
-            theFile.Read(bom, 0, 4)
-        Catch ex As Exception
-            Debug.Print("Error: " & ex.Message & Environment.NewLine & "Number: " & ex.HResult.ToString)
-            Return Nothing
-        End Try
-
-        ' Detect BOM type
-        If bom(0) = &H2B AndAlso bom(1) = &H2F AndAlso bom(2) = &H76 Then
-            Return Encoding.UTF7
-        ElseIf bom(0) = &HEF AndAlso bom(1) = &HBB AndAlso bom(2) = &HBF Then
-            Return Encoding.UTF8
-        ElseIf bom(0) = &HFF AndAlso bom(1) = &HFE Then
-            Return Encoding.Unicode
-        ElseIf bom(0) = &HFE AndAlso bom(1) = &HFF Then
-            Return Encoding.BigEndianUnicode
-        ElseIf bom(0) = 0 AndAlso bom(1) = 0 AndAlso bom(2) = &HFE AndAlso bom(3) = &HFF Then
-            Return Encoding.UTF32
-        Else
-            ' Default to
-            Return Encoding.ASCII
-        End If
     End Function
 End Class
