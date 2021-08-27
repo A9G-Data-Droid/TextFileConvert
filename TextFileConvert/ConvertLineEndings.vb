@@ -1,6 +1,8 @@
 Imports System.IO
 Imports System.Text
 
+
+
 Public Class ConvertLineEndings
     ''' <summary>
     '''     These are the different conversions that this library can perform.
@@ -37,10 +39,10 @@ Public Class ConvertLineEndings
     ''' <summary>
     '''     Loads a whole text file in to memory, Performs a find\replace, and writes a new file.
     ''' </summary>
-    ''' <param name="originalFile">The file to convert.</param>
+    ''' <param name="originalFile">The file path to convert.</param>
     ''' <param name="newFile">The name of a new file to create.</param>
-    ''' <param name="convertMode">This is the type of conversion we are going to perform</param>
-    ''' <returns>Exit code.</returns>
+    ''' <param name="convertMode">This is the type of conversion we are going to perform.</param>
+    ''' <returns>Exit code. 0 is success. -1 is a symbolic link.</returns>
     Private Shared Async Function ReplaceLineEndings(originalFile As String, newFile As String,
                                                      convertMode As TextConvertMode) As Task(Of Integer)
 
@@ -65,44 +67,62 @@ Public Class ConvertLineEndings
             Return ex.HResult
         End Try
 
-        Return 0 ' Exit status 0 is a good thing
+        Return 0
     End Function
 
+    ''' <summary>
+    '''     This is where the actual conversion logic lives.
+    ''' </summary>
+    ''' <param name="originalFile">The file you want to convert.</param>
+    ''' <param name="fileEncoding">The encoding you want to read that file as.</param>
+    ''' <param name="convertMode">The type of conversion you want to perform.</param>
+    ''' <returns>The full text of the file with new line endings.</returns>
     Private Shared Async Function GetConvertedText(originalFile As FileStream, fileEncoding As Encoding, convertMode As TextConvertMode) As Task(Of String)
-        Const CR As Char = ChrW(13)
-        Const LF As Char = ChrW(10)
+        Const CR As Char = ChrW(13)  '  Carriage Return
+        Const LF As Char = ChrW(10)  '  Line Feed
 
         Dim convertedLines As New StringBuilder
         Using oldFile As New StreamReader(originalFile, fileEncoding, True)
-            Do Until oldFile.EndOfStream  ' Read through the whole file
-                Dim readBuffer(0) As Char
-                Dim readChars As Integer = Await oldFile.ReadAsync(readBuffer, 0, 1)
-                If readChars >= 1 Then
-                    Select Case convertMode
-                        Case TextConvertMode.Dos2Ux
+            Select Case convertMode
+                Case TextConvertMode.Dos2Ux
+                    Do Until oldFile.EndOfStream
+                        Dim readBuffer(0) As Char
+                        Dim readChars As Integer = Await oldFile.ReadAsync(readBuffer, 0, 1)
+                        If readChars >= 1 Then
+                            ' Look for Dos line endings
                             If readBuffer(0) = CR AndAlso oldFile.Peek() = 10 Then
                                 ' Strip out CR chars if followed by LF
                                 Await oldFile.ReadAsync(readBuffer, 0, 1)
                             End If
-                        Case TextConvertMode.Ux2Dos
+
+                            'Yield readBuffer
+                            convertedLines.Append(readBuffer)
+                        End If
+                    Loop
+                Case TextConvertMode.Ux2Dos
+                    Do Until oldFile.EndOfStream
+                        Dim readBuffer(0) As Char
+                        Dim readChars As Integer = Await oldFile.ReadAsync(readBuffer, 0, 1)
+                        If readChars >= 1 Then
+                            ' Check for CR first to avoid doubling the CR character when LF is found
                             If readBuffer(0) = CR AndAlso oldFile.Peek() = 10 Then
-                                ReDim Preserve readBuffer(1)
                                 ' This is a DOS line ending, keep it.
+                                ReDim Preserve readBuffer(1)
                                 Dim tempBuffer(1) As Char
                                 Await oldFile.ReadAsync(tempBuffer, 0, 1)
                                 readBuffer(1) = tempBuffer(0)
                             ElseIf readBuffer(0) = LF Then
+                                ' This is a Unix line ending. Add preceeding CR.
                                 ReDim readBuffer(1)
-                                ' Add preceeding CR
                                 readBuffer(0) = CR
                                 readBuffer(1) = LF
                             End If
-                    End Select
 
-                    'Yield readBuffer
-                    convertedLines.Append(readBuffer)
-                End If
-            Loop
+                            'Yield readBuffer
+                            convertedLines.Append(readBuffer)
+                        End If
+                    Loop
+            End Select
         End Using
 
         Return convertedLines.ToString

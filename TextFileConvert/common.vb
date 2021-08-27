@@ -48,9 +48,10 @@ DESCRIPTION
 
     ''' <summary>
     '''     Detect when the file in the given path is a symbolic link.
+    '''     WARNING: Could have false positive for any file with a reparse point that is not a symbolic link. 
     ''' </summary>
-    ''' <param name="path"></param>
-    ''' <returns>True if </returns>
+    ''' <param name="path">Full path to file to test.</param>
+    ''' <returns>True if Reparse Point is found.</returns>
     Public Function IsSymbolic(path As String) As Boolean
         Dim pathInfo As New FileInfo(path)
         Return pathInfo.Attributes.HasFlag(FileAttributes.ReparsePoint)

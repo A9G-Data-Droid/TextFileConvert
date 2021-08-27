@@ -2,6 +2,8 @@ Imports System.IO
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
 Imports TextFileConvert
 
+
+
 Namespace TestLineEndingConversion
     <TestClass>
     Public Class IntegrationTesting
