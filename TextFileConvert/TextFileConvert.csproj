@@ -8,19 +8,43 @@
     <Description>This provides text file conversion capabilities like the common Unix utilities "ux2dos" and "dos2ux".</Description>
     <Copyright>Copyright 2018 Adam Kauffman</Copyright>
     <Deterministic>false</Deterministic>
-    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <AssemblyVersion>2.0.0</AssemblyVersion>
     <PackageReleaseNotes>The first release verified with integration tests.</PackageReleaseNotes>
     <PackageTags>ux2dos, dos2ux</PackageTags>
     <PackageProjectUrl>https://github.com/A9G-Data-Droid/TextFileConvert</PackageProjectUrl>
     <PackageIcon>ux2dos.png</PackageIcon>
     <RepositoryUrl>https://github.com/A9G-Data-Droid/TextFileConvert</RepositoryUrl>
-    <RepositoryType>GitHub</RepositoryType>
+    <RepositoryType></RepositoryType>
     <PackageLicenseExpression>BSD-2-Clause</PackageLicenseExpression>
     <Company />
     <DefaultItemExcludes>$(DefaultItemExcludes);$(ProjectDir)**\*.vb</DefaultItemExcludes>
     <LangVersion>latest</LangVersion>
+    <ApplicationIcon>ux2dos.ico</ApplicationIcon>
+    <Nullable>enable</Nullable>
+    <Title>Text File Convert Line Endings</Title>
+    <FileVersion>$(AssemblyVersion)</FileVersion>
+    <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
+    <EnableNETAnalyzers>True</EnableNETAnalyzers>
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
+    <Version>$(AssemblyVersion)</Version>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <WarningLevel>7</WarningLevel>
+    <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <WarningLevel>7</WarningLevel>
+    <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include="ux2dos.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
     <None Include="ux2dos.png" Pack="true" PackagePath="">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
