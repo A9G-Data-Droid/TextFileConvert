@@ -1,19 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net4.8</TargetFramework>
     <OutputType>Exe</OutputType>
-    <PublishSingleFile>true</PublishSingleFile>
-    <SelfContained>true</SelfContained>
-    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
-    <PublishTrimmed>true</PublishTrimmed>
-    <PublishReadyToRun>true</PublishReadyToRun>
-    <StartupObject>Sub Main</StartupObject>
-    <MyType>Empty</MyType>
-    <OptionStrict>On</OptionStrict>
-    <OptionInfer>Off</OptionInfer>
-    <Description>This provides text file conversion capabilities like the common Unix utility "dos2ux".</Description>
+    <StartupObject>ux2dos.Ux2Dos</StartupObject>
+    <Description>This provides text file conversion capabilities like the common Unix utility "ux2dos".</Description>
     <Copyright>Copyright 2018 Adam Kauffman</Copyright>
-    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <AssemblyVersion>1.1.0</AssemblyVersion>
     <PackageReleaseNotes>The first release verified with integration tests.</PackageReleaseNotes>
     <ApplicationIcon>ux2dos.ico</ApplicationIcon>
     <ApplicationManifest>My Project\app.manifest</ApplicationManifest>
@@ -21,20 +13,32 @@
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
     <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <DefaultItemExcludes>$(DefaultItemExcludes);$(ProjectDir)**\*.vb</DefaultItemExcludes>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
+    <EnableNETAnalyzers>True</EnableNETAnalyzers>
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
+    <FileVersion>$(AssemblyVersion)</FileVersion>
+    <Version>$(AssemblyVersion)</Version>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>embedded</DebugType>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
+    <WarningLevel>7</WarningLevel>
+    <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DefineDebug>false</DefineDebug>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
+    <WarningLevel>7</WarningLevel>
+    <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\TextFileConvert\TextFileConvert.vbproj" />
+    <Reference Include="Microsoft.VisualBasic" />
+    <ProjectReference Include="..\TextFileConvert\TextFileConvert.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.Windows.Compatibility" Version="5.0.2" />
+    <PackageReference Include="Microsoft.Windows.Compatibility" Version="8.0.8" />
   </ItemGroup>
   <Target Name="Init">
     <Warning Text="$(TargetFrameworkMoniker)" />
