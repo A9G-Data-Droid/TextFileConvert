@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <RootNamespace>TextFileConvert</RootNamespace>
     <TargetFramework>netstandard2.0</TargetFramework>
@@ -15,11 +15,10 @@
     <PackageIcon>ux2dos.png</PackageIcon>
     <RepositoryUrl>https://github.com/A9G-Data-Droid/TextFileConvert</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
-    <PublishSingleFile>true</PublishSingleFile>
-    <OptionStrict>On</OptionStrict>
-    <OptionInfer>Off</OptionInfer>
     <PackageLicenseExpression>BSD-2-Clause</PackageLicenseExpression>
     <Company />
+    <DefaultItemExcludes>$(DefaultItemExcludes);$(ProjectDir)**\*.vb</DefaultItemExcludes>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <None Include="ux2dos.png" Pack="true" PackagePath="">
