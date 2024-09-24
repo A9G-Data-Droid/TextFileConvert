@@ -1,12 +1,14 @@
 ﻿using System;
 using System.IO;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace TextFileConvert;
 
 public static class Common
 {
+    public const byte Cr = 13;  //'\r';  // Carriage Return
+    public const byte Lf = 10;  //'\n';  // Line Feed
+
     /// <summary>
     /// This is the command line help that is displayed when invalid parameters are given.
     /// </summary>
@@ -32,10 +34,11 @@ public static class Common
     /// </summary>
     /// <param name="theFile">The file to get the encoding pattern from.</param>
     /// <returns>Encoding type, defaults to ASCII.</returns>
-    public static async Task<Encoding> GetEncoding(FileStream theFile)
+    [Obsolete("No longer used internally. Prefer native methods.")]
+    public static Encoding GetEncoding(FileStream theFile)
     {
         var bom = new byte[4];
-        var count = await theFile.ReadAsync(bom, 0, 4);
+        var count = theFile.Read(bom, 0, 4);
 
         // Detect BOM type
         if (count > 2 && bom[0] == 0x2B && bom[1] == 0x2F && bom[2] == 0x76)
